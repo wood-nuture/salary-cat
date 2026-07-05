@@ -633,14 +633,16 @@ function updUI(){
     document.getElementById('amountDec').textContent='.'+dp;
   }
 
-  // 语录
+  // 语录（稳定版：只随状态切换改变，不闪烁）
   const ft=document.getElementById('amountFt');
-  if(slack){ft.textContent=QT.slack[Math.floor(Math.random()*QT.slack.length)];}
-  else if(st==='before') ft.textContent=QT.before[Math.floor(Math.random()*QT.before.length)];
-  else if(st==='rest') ft.textContent=QT.rest[Math.floor(Math.random()*QT.rest.length)];
-  else if(st==='lunch') ft.textContent=QT.lunch[Math.floor(Math.random()*QT.lunch.length)];
-  else if(st==='after') ft.textContent=QT.after[Math.floor(Math.random()*QT.after.length)];
-  else ft.textContent=QT.wk[Math.floor(Math.random()*QT.wk.length)];
+  if(typeof updUI._qIdx === 'undefined') updUI._qIdx={};
+  const qKey = slack?'slack':(st==='working'?'wk':st);
+  if(qKey !== updUI._qKey){
+    updUI._qKey = qKey;
+    if(!updUI._qIdx[qKey]) updUI._qIdx[qKey]=0;
+    updUI._qIdx[qKey] = (updUI._qIdx[qKey]+1) % QT[qKey].length;
+    ft.textContent = QT[qKey][updUI._qIdx[qKey]];
+  }
 
   // 倒计时
   const cd=document.getElementById('cd'),cl=document.getElementById('cdLbl');
